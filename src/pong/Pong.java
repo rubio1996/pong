@@ -7,14 +7,14 @@ package pong;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 
 /**
@@ -58,6 +58,13 @@ public class Pong extends Application {
         root.getChildren().add(circleBall);
         //CAMBIAR COLOR A LA BOLA POR EL CODIGO RGB
         circleBall.setFill(Color.web("#51FE00"));
+        //Dibujo de la red
+        for(int i=0; i<SCENE_TAM_Y; i+=30){
+            Line line = new Line(SCENE_TAM_X/2,i,SCENE_TAM_X/2,i+10);
+            line.setStroke(Color.GREEN);
+            line.setStrokeWidth(2);
+            root.getChildren().add(line);
+        }
         //Ahora le daremos valores a las teclas para cuando pulses una tecla
         scene.setOnKeyPressed((KeyEvent event) -> {
             //Crearemos un swith que es como una sentencia de if  pero tiene multiples opciones para selecionar la tecla  y el evento
@@ -77,7 +84,7 @@ public class Pong extends Application {
         });
          //Creacion de la pala donde chocara la pelota
                 Rectangle rectStick = new Rectangle(SCENE_TAM_X*0.9, stickPosY, STICK_WIDTH, STICK_HEIGHT);
-                rectStick.setFill(Color.WHITE);
+                rectStick.setFill(Color.GREEN);
                 //añadiremos el rectangulo o pala como hijo del panel principal 
                 root.getChildren().add(rectStick);
         AnimationTimer animationBall = new AnimationTimer(){
@@ -115,8 +122,15 @@ public class Pong extends Application {
                 }
                 //MOVEMOS EL RECTANGULO A LA POSICION ACTUAL QUE SE LA HEMOS DADO ANTERIORMENTE
                 rectStick.setY(stickPosY);
-                
-            };
+                //añadiremos a la clase de circulo y rectangulo que sea un colider y te diga si da o no
+                Shape.intersect(circleBall, rectStick);
+                Shape shapeColision = Shape.intersect(circleBall, rectStick);
+                boolean colisionVacia = shapeColision.getBoundsInLocal().isEmpty();
+                if (colisionVacia == false) {
+                    //colision detectada, mover bola hacia hizquierda
+                    BallCurrentSpeedX = -3; 
+                }
+            };  
       
         };
         animationBall.start();
