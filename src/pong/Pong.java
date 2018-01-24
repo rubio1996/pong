@@ -7,14 +7,19 @@ package pong;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 /**
@@ -24,11 +29,11 @@ import javafx.stage.Stage;
 public class Pong extends Application {
    int ballCenterX = 10;
    int ballCentery = 10;
-   double valory = 30;
-   double valorx = 10;
+   double valorY = 30;
+   double valorX = 10;
    double radioCirculo = 7;
-   int BallCurrentSpeedX = 3;
-   int BallCurrentSpeedy = 3;
+   int ballCurrentSpeedX = 3;
+   int ballCurrentSpeedy = 3;
    //Creacion de constantes de la medida de la ventana
    final int SCENE_TAM_X = 600;
    final int SCENE_TAM_Y = 400;
@@ -37,6 +42,9 @@ public class Pong extends Application {
    final int STICK_HEIGHT = 50;
    int stickPosY = (SCENE_TAM_Y - STICK_HEIGHT) /2;
    int stickCurrentSpeed = 0;
+   final int TEXT_SIZE = 15;
+   //creacion de variable para la puntuacion
+   int score;
     @Override
     public void start(Stage primaryStage) {
 
@@ -50,8 +58,8 @@ public class Pong extends Application {
         //Creacion del circulo 
         Circle circleBall = new Circle();
         //Posicionar respecto xy el centro del circulo
-        circleBall.setCenterX(valorx);
-        circleBall.setCenterY(valory);
+        circleBall.setCenterX(valorX);
+        circleBall.setCenterY(valorY);
         //Tamaño del radio del circulo
         circleBall.setRadius(radioCirculo);
         //AHORA PARA MOSTRAR EL CIRCULO EN LA VENTANA  HABRAQUE AÑADIR EL CIRCULO A LA VENTANA
@@ -83,29 +91,68 @@ public class Pong extends Application {
             stickCurrentSpeed = 0;
         });
          //Creacion de la pala donde chocara la pelota
-                Rectangle rectStick = new Rectangle(SCENE_TAM_X*0.9, stickPosY, STICK_WIDTH, STICK_HEIGHT);
-                rectStick.setFill(Color.GREEN);
-                //añadiremos el rectangulo o pala como hijo del panel principal 
-                root.getChildren().add(rectStick);
+        Rectangle rectStick = new Rectangle(SCENE_TAM_X*0.9, stickPosY, STICK_WIDTH, STICK_HEIGHT);
+        rectStick.setFill(Color.GREEN);
+        //añadiremos el rectangulo o pala como hijo del panel principal 
+        root.getChildren().add(rectStick);
+        //LAYOUTS PARA MOSTRAR PUNTUACIONES
+        //Layout principal
+        HBox paneScore = new HBox();
+        paneScore.setTranslateY(20);
+        paneScore.setMinWidth(SCENE_TAM_X);
+        paneScore.setAlignment(Pos.CENTER);
+        paneScore.setSpacing(100);
+        root.getChildren().add(paneScore);
+        //Layout para puntuacion actual
+        HBox paneCurrentScore = new HBox();
+        paneCurrentScore.setSpacing(10);
+        paneScore.getChildren().add(paneCurrentScore);
+        //Layout para puntuacion maxima
+        HBox paneHightScore = new HBox();
+        paneHightScore.setSpacing(10);
+        paneScore.getChildren().add(paneHightScore);
+        //Texto de etiqueta para la puntuacion
+        Text textTitleScore = new Text("Score:");
+        textTitleScore.setFont(Font.font(TEXT_SIZE));
+        textTitleScore.setFill(Color.WHITE);
+        //Texto para la puntuacion
+        Text textScore = new Text("0");
+        textScore.setFont(Font.font(TEXT_SIZE));
+        textScore.setFill(Color.WHITE);
+        //Texto de etiqueta para la puntuacion maxima
+        Text textTitleHighScore = new Text("Max.Score");
+        textTitleHighScore.setFont(Font.font(TEXT_SIZE));
+        textTitleHighScore.setFill(Color.WHITE);
+        //Texto para la puntuacion maxima
+        Text textHighScore = new Text("0");
+        textHighScore.setFont(Font.font(TEXT_SIZE));
+        textHighScore.setFill(Color.WHITE);
+        //Añadir los textos a los layouts reservados para ellos
+        paneCurrentScore.getChildren().add(textTitleScore);
+        paneCurrentScore.getChildren().add(textScore);
+        paneHightScore.getChildren().add(textTitleHighScore);
+        paneHightScore.getChildren().add(textHighScore);
+
+        ///////////////////////////////////////////////////ANIMATION TIMER///////////////////////////////////////
         AnimationTimer animationBall = new AnimationTimer(){
          
             @Override
             public void handle(long now) {
                 circleBall.setCenterX(ballCenterX);        
-                ballCenterX += BallCurrentSpeedX;
+                ballCenterX += ballCurrentSpeedX;
                 if(ballCenterX >= SCENE_TAM_X) {
-                    BallCurrentSpeedX = -3;
+                    ballCurrentSpeedX = -3;
                 }
                 if(ballCenterX <= 0){
-                    BallCurrentSpeedX = 3;
+                    ballCurrentSpeedX = 3;
                 }
                 circleBall.setCenterY(ballCentery);        
-                ballCentery += BallCurrentSpeedy;
+                ballCentery += ballCurrentSpeedy;
                 if(ballCentery >= SCENE_TAM_Y) {
-                    BallCurrentSpeedy = -3;
+                    ballCurrentSpeedy = -3;
                 }
                 if(ballCentery <= 0){
-                    BallCurrentSpeedy = 3;
+                    ballCurrentSpeedy = 3;
                 }
                 //actualizar posicion de la pala
                 rectStick.setY(stickPosY);
@@ -128,7 +175,10 @@ public class Pong extends Application {
                 boolean colisionVacia = shapeColision.getBoundsInLocal().isEmpty();
                 if (colisionVacia == false) {
                     //colision detectada, mover bola hacia hizquierda
-                    BallCurrentSpeedX = -3; 
+                    ballCurrentSpeedX = -3;
+                    //incrementa la puntuacion
+                    score++;
+                    textScore.setText(String.valueOf(score));
                 }
             };  
       
